@@ -10,6 +10,14 @@
   version = "v0.34.0"
 
 [[projects]]
+  digest = "1:680f32d99ff8bfce2d6a934ba1e168f559bd9c94b69a500f1019c21ff5756429"
+  name = "github.com/Microsoft/go-winio"
+  packages = ["."]
+  pruneopts = "T"
+  revision = "97e4973ce50b2ff5f09635a57e2b88a037aae829"
+  version = "v0.4.11"
+
+[[projects]]
   branch = "master"
   digest = "1:ad4589ec239820ee99eb01c1ad47ebc5f8e02c4f5103a9b210adff9696d89f36"
   name = "github.com/beorn7/perks"
@@ -675,6 +683,7 @@
     "pkg/api/errors",
     "pkg/api/meta",
     "pkg/api/resource",
+    "pkg/api/validation/path",
     "pkg/apis/meta/internalversion",
     "pkg/apis/meta/v1",
     "pkg/apis/meta/v1/unstructured",
@@ -719,6 +728,17 @@
   pruneopts = "T"
   revision = "eddba98df674a16931d2d4ba75edc3a389bf633a"
   version = "kubernetes-1.12.3"
+
+[[projects]]
+  branch = "master"
+  digest = "1:2fa87290f7eccdc9949436e837e077d59ee4f9d8e1d0defd7f9b361a8b32db07"
+  name = "k8s.io/apiserver"
+  packages = [
+    "pkg/storage",
+    "pkg/storage/etcd",
+  ]
+  pruneopts = "T"
+  revision = "e5d129eb7af7052f2b60724445ed61166c4a288c"
 
 [[projects]]
   digest = "1:5aa94390c366adc57a82b19ad4f99482ab8fbeca0a2ff7b09db12d7baf590e46"
@@ -841,6 +861,17 @@
   revision = "0317810137be915b9cf888946c6e115c1bfac693"
 
 [[projects]]
+  digest = "1:01562a7e9fa8674285e819288aa73217679f3c3f9353aa7c0a21dc1f7919928b"
+  name = "k8s.io/kubernetes"
+  packages = [
+    "pkg/kubelet/util",
+    "pkg/kubelet/util/manager",
+  ]
+  pruneopts = "T"
+  revision = "eec55b9ba98609a46fee712359c7b5b365bdd920"
+  version = "v1.13.1"
+
+[[projects]]
   digest = "1:0366859202a26d3ad16ff9d7545c20f2a95ced5183f2f3cdb762522dbaffe6ea"
   name = "sigs.k8s.io/controller-runtime"
   packages = [
@@ -869,6 +900,7 @@
     "pkg/source/internal",
     "pkg/webhook",
     "pkg/webhook/admission",
+    "pkg/webhook/admission/builder",
     "pkg/webhook/admission/types",
     "pkg/webhook/internal/cert",
     "pkg/webhook/internal/cert/generator",
@@ -919,16 +951,25 @@
     "github.com/emicklei/go-restful",
     "github.com/onsi/ginkgo",
     "github.com/onsi/gomega",
+    "k8s.io/api/core/v1",
     "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1",
+    "k8s.io/apimachinery/pkg/api/resource",
     "k8s.io/apimachinery/pkg/runtime",
     "k8s.io/client-go/plugin/pkg/client/auth/gcp",
     "k8s.io/code-generator/cmd/deepcopy-gen",
+    "k8s.io/kubernetes/pkg/kubelet/util/manager",
+    "sigs.k8s.io/controller-runtime/pkg/client",
     "sigs.k8s.io/controller-runtime/pkg/client/config",
     "sigs.k8s.io/controller-runtime/pkg/controller",
     "sigs.k8s.io/controller-runtime/pkg/handler",
     "sigs.k8s.io/controller-runtime/pkg/manager",
+    "sigs.k8s.io/controller-runtime/pkg/runtime/inject",
     "sigs.k8s.io/controller-runtime/pkg/runtime/signals",
     "sigs.k8s.io/controller-runtime/pkg/source",
+    "sigs.k8s.io/controller-runtime/pkg/webhook",
+    "sigs.k8s.io/controller-runtime/pkg/webhook/admission",
+    "sigs.k8s.io/controller-runtime/pkg/webhook/admission/builder",
+    "sigs.k8s.io/controller-runtime/pkg/webhook/admission/types",
     "sigs.k8s.io/controller-tools/cmd/controller-gen",
     "sigs.k8s.io/testing_frameworks/integration",
   ]

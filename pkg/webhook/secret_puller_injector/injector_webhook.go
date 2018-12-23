@@ -20,7 +20,9 @@ import (
 	"fmt"
 	"log"
 
-	"k8s.io/kubernetes/pkg/kubelet/util/manager"
+	admissionregistrationv1beta1 "k8s.io/api/admissionregistration/v1beta1"
+	corev1 "k8s.io/api/core/v1"
+	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission/builder"
 )

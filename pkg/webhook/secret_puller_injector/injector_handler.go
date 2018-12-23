@@ -21,10 +21,16 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/aws/aws-sdk-go/aws/client"
+	"github.com/cvgw/secret-puller-admission/lib/secret_puller/factory"
+	corev1 "k8s.io/api/core/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/runtime/inject"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission/types"
+)
+
+const (
+	vaultAddr = "localhost:8200"
 )
 
 type secretPullerInjector struct {
@@ -74,8 +80,17 @@ func (a *secretPullerInjector) InjectDecoder(d types.Decoder) error {
 	return nil
 }
 
-func (a *secretPullerInjector) mutatePodsFn(ctx context.Context, copy *corev1.Pod) error {
+func (a *secretPullerInjector) mutatePodsFn(ctx context.Context, pod *corev1.Pod) error {
 	log.Println("I got a request")
+
+	secretPullerFactory := factory.New(vaultAddr, false)
+
+	pod.Spec.InitContainers = append(pod.Spec.InitContainers, secretPullerFactory.Container())
+	pod.Spec.Volumes = append(pod.Spec.Volumes, secretPullerFactory.Volumes()...)
+
+	for _, container := range pod.Spec.Containers {
+		container.VolumeMounts = append(container.VolumeMounts, secretPullerFactory.VolumeMount())
+	}
 
 	return nil
 }
