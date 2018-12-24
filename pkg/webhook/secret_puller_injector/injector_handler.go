@@ -30,7 +30,8 @@ import (
 )
 
 const (
-	vaultAddr = "localhost:8200"
+	vaultAddr          = "localhost:8200"
+	injectorAnnotation = "secret-puller-injector.admission"
 )
 
 type secretPullerInjector struct {
@@ -45,17 +46,21 @@ var _ admission.Handler = &secretPullerInjector{}
 // +kubebuilder:rbac:groups=admissionregistration.k8s.io,resources=mutatingwebhookconfigurations,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=,resources=services,verbs=get;list;watch;create;update;patch;delete
 func (a *secretPullerInjector) Handle(ctx context.Context, req types.Request) types.Response {
+	log.Println("Request received")
 	pod := &corev1.Pod{}
 
 	err := a.decoder.Decode(req, pod)
 	if err != nil {
 		return admission.ErrorResponse(http.StatusBadRequest, err)
 	}
-	copy := pod.DeepCopy()
 
-	err = a.mutatePodsFn(ctx, copy)
-	if err != nil {
-		return admission.ErrorResponse(http.StatusInternalServerError, err)
+	copy := pod.DeepCopy()
+	if pod.Annotations != nil && pod.Annotations[injectorAnnotation] == "true" {
+		log.Println("Pod has required annotation")
+		err = a.mutatePodsFn(ctx, copy)
+		if err != nil {
+			return admission.ErrorResponse(http.StatusInternalServerError, err)
+		}
 	}
 
 	// admission.PatchResponse generates a Response containing patches.

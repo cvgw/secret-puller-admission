@@ -32,8 +32,8 @@ func Add(mgr manager.Manager) error {
 }
 
 func add(mgr manager.Manager) error {
-	name := "secret-puller-injector-webhook"
-	namespace := "kube-system"
+	name := "secret-puller-admission-controller-manager"
+	namespace := "default"
 
 	svr, err := webhook.NewServer(name, mgr, webhook.ServerOptions{
 		CertDir: "/tmp/cert",
@@ -57,6 +57,7 @@ func add(mgr manager.Manager) error {
 		Operations(admissionregistrationv1beta1.Create).
 		ForType(&corev1.Pod{}).
 		Handlers(&secretPullerInjector{}).
+		FailurePolicy(admissionregistrationv1beta1.Fail).
 		WithManager(mgr).
 		Build()
 	if err != nil {

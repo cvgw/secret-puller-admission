@@ -16,11 +16,9 @@ limitations under the License.
 
 package webhook
 
-import (
-	secretPullerInjector "github.com/cvgw/secret-puller-admission/src/pkg/webhook/secret_puller_injector"
-)
+import "github.com/cvgw/secret-puller-admission/pkg/webhook/secret_puller_injector"
 
 func init() {
 	// AddToManagerFuncs is a list of functions to create controllers and add them to a manager.
-	AddToManagerFuncs = append(AddToManagerFuncs, secretPullerInjector.Add)
+	AddToManagerFuncs = append(AddToManagerFuncs, secret_puller_injector.Add)
 }

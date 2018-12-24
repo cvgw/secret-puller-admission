@@ -5,6 +5,7 @@ FROM golang:1.10.3 as builder
 WORKDIR /go/src/github.com/cvgw/secret-puller-admission
 COPY pkg/    pkg/
 COPY cmd/    cmd/
+COPY lib/    lib/
 COPY vendor/ vendor/
 
 # Build
