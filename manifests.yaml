@@ -92,6 +92,9 @@ spec:
         image: secret-puller-injector:latest
         imagePullPolicy: IfNotPresent
         name: manager
+        env:
+        - name: VAULT_ADDR
+          value: "localhost:8200"
         resources:
           limits:
             cpu: 100m

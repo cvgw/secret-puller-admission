@@ -18,8 +18,11 @@ package secret_puller_injector
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/cvgw/secret-puller-admission/lib/secret_puller/factory"
 	corev1 "k8s.io/api/core/v1"
@@ -30,7 +33,7 @@ import (
 )
 
 const (
-	vaultAddr          = "localhost:8200"
+	vaultAddrVar       = "VAULT_ADDR"
 	injectorAnnotation = "secret-puller-injector.admission"
 )
 
@@ -87,6 +90,11 @@ func (a *secretPullerInjector) InjectDecoder(d types.Decoder) error {
 
 func (a *secretPullerInjector) mutatePodsFn(ctx context.Context, pod *corev1.Pod) error {
 	log.Println("I got a request")
+
+	vaultAddr := os.Getenv(vaultAddrVar)
+	if vaultAddr == "" {
+		return errors.New(fmt.Sprintf("%s cannot be blank", vaultAddrVar))
+	}
 
 	secretPullerFactory := factory.New(vaultAddr, false)
 
