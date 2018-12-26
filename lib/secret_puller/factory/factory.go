@@ -33,8 +33,10 @@ const (
 	initContainerMem     = "1G"
 	secretVolumeName     = "secrets"
 	secretMountPath      = "/secrets"
-
-	vaultAuthSecretName = "vaultauth"
+	saTokenMountPath     = "/etc/sa-token"
+	saTokenVolName       = "secret-puller-sa-token"
+	saTokenSecretName    = "secret-puller-sa-token"
+	vaultAuthSecretName  = "vaultauth"
 
 	vaultDefaultAddr = "https://vault:8200"
 	secretPrefix     = "secret"
@@ -68,6 +70,10 @@ func (f factory) Container() corev1.Container {
 				Name:  "VAULT_SSL_VERIFY",
 				Value: f.vaultVerifyTLS,
 			},
+			{
+				Name:  "SERVICEACCOUNT_DIR",
+				Value: saTokenMountPath,
+			},
 		},
 		VolumeMounts: []corev1.VolumeMount{
 			f.VolumeMount(),
@@ -78,6 +84,10 @@ func (f factory) Container() corev1.Container {
 			{
 				Name:      secretKeysVolumeName,
 				MountPath: "/secretkeys",
+			},
+			{
+				Name:      "sa-token",
+				MountPath: saTokenMountPath,
 			},
 		},
 		Resources: corev1.ResourceRequirements{
@@ -104,6 +114,15 @@ func (f factory) Volumes() (volumes []corev1.Volume) {
 		VolumeSource: corev1.VolumeSource{
 			Secret: &corev1.SecretVolumeSource{
 				SecretName: vaultAuthSecretName,
+			},
+		},
+	})
+
+	volumes = append(volumes, corev1.Volume{
+		Name: saTokenVolName,
+		VolumeSource: corev1.VolumeSource{
+			Secret: &corev1.SecretVolumeSource{
+				SecretName: saTokenSecretName,
 			},
 		},
 	})
