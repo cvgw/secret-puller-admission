@@ -86,7 +86,7 @@ func (f factory) Container() corev1.Container {
 				MountPath: "/secretkeys",
 			},
 			{
-				Name:      "sa-token",
+				Name:      saTokenVolName,
 				MountPath: saTokenMountPath,
 			},
 		},
