@@ -11,6 +11,7 @@ spec:
     metadata:
       annotations:
         secret-puller-injector.admission: "true"
+        secret/TEST_SECRET: test_vault_path_foo
       labels:
         app: nginx
     spec:

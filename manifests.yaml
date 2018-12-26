@@ -22,6 +22,34 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   creationTimestamp: null
+  name: secret-puller-container
+rules:
+- apiGroups:
+  - "" 
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  creationTimestamp: null
+  name: secret-puller-container
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: secret-puller-container
+subjects:
+- kind: ServiceAccount
+  name: secret-puller
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
   name: secret-puller-admission-manager-role
 rules:
 - apiGroups:
@@ -102,8 +130,8 @@ spec:
       containers:
       - command:
         - /root/manager
-        image: secret-puller-injector:latest
-        imagePullPolicy: IfNotPresent
+        image: kubernetes.service.consul:5000/secret-puller-injector:latest
+        imagePullPolicy: Always
         name: manager
         env:
         - name: VAULT_ADDR
