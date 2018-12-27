@@ -135,7 +135,7 @@ spec:
         name: manager
         env:
         - name: VAULT_ADDR
-          value: "localhost:8200"
+          value: "https://example.default.svc.cluster.local:8200"
         resources:
           limits:
             cpu: 100m
