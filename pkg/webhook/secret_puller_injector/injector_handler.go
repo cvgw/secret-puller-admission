@@ -91,6 +91,8 @@ func (a *secretPullerInjector) InjectDecoder(d types.Decoder) error {
 func (a *secretPullerInjector) mutatePodsFn(ctx context.Context, pod *corev1.Pod) error {
 	log.Println("I got a request")
 
+	spec := pod.Spec
+
 	vaultAddr := os.Getenv(vaultAddrVar)
 	if vaultAddr == "" {
 		return errors.New(fmt.Sprintf("%s cannot be blank", vaultAddrVar))
@@ -98,12 +100,17 @@ func (a *secretPullerInjector) mutatePodsFn(ctx context.Context, pod *corev1.Pod
 
 	secretPullerFactory := factory.New(vaultAddr, false)
 
-	pod.Spec.InitContainers = append(pod.Spec.InitContainers, secretPullerFactory.Container())
-	pod.Spec.Volumes = append(pod.Spec.Volumes, secretPullerFactory.Volumes()...)
+	spec.InitContainers = append(spec.InitContainers, secretPullerFactory.Container())
+	spec.Volumes = append(spec.Volumes, secretPullerFactory.Volumes()...)
 
-	for _, container := range pod.Spec.Containers {
+	mutatedContainers := make([]corev1.Container, 0)
+	for _, container := range spec.Containers {
 		container.VolumeMounts = append(container.VolumeMounts, secretPullerFactory.VolumeMount())
+		mutatedContainers = append(mutatedContainers, container)
 	}
+
+	spec.Containers = mutatedContainers
+	pod.Spec = spec
 
 	return nil
 }
