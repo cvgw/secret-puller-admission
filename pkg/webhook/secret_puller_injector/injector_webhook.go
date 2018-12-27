@@ -21,7 +21,7 @@ import (
 	"log"
 
 	admissionregistrationv1beta1 "k8s.io/api/admissionregistration/v1beta1"
-	corev1 "k8s.io/api/core/v1"
+	appsv1 "k8s.io/api/apps/v1"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission/builder"
@@ -55,7 +55,7 @@ func add(mgr manager.Manager) error {
 	wh, err := builder.NewWebhookBuilder().
 		Mutating().
 		Operations(admissionregistrationv1beta1.Create).
-		ForType(&corev1.Pod{}).
+		ForType(&appsv1.Deployment{}).
 		Handlers(&secretPullerInjector{}).
 		FailurePolicy(admissionregistrationv1beta1.Fail).
 		WithManager(mgr).
