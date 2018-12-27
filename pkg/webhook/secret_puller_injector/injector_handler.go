@@ -25,6 +25,7 @@ import (
 	"os"
 
 	"github.com/cvgw/secret-puller-admission/lib/secret_puller/factory"
+	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/runtime/inject"
@@ -50,24 +51,26 @@ var _ admission.Handler = &secretPullerInjector{}
 // +kubebuilder:rbac:groups=,resources=services,verbs=get;list;watch;create;update;patch;delete
 func (a *secretPullerInjector) Handle(ctx context.Context, req types.Request) types.Response {
 	log.Println("Request received")
-	pod := &corev1.Pod{}
+	resource := &appsv1.Deployment{}
 
-	err := a.decoder.Decode(req, pod)
+	err := a.decoder.Decode(req, resource)
 	if err != nil {
 		return admission.ErrorResponse(http.StatusBadRequest, err)
 	}
 
-	copy := pod.DeepCopy()
-	if pod.Annotations != nil && pod.Annotations[injectorAnnotation] == "true" {
-		log.Println("Pod has required annotation")
-		err = a.mutatePodsFn(ctx, copy)
+	annotations := resource.Spec.Template.Annotations
+
+	copy := resource.DeepCopy()
+	if annotations != nil && annotations[injectorAnnotation] == "true" {
+		log.Println("Resource has required annotation")
+		err = a.mutateResourceFn(ctx, copy)
 		if err != nil {
 			return admission.ErrorResponse(http.StatusInternalServerError, err)
 		}
 	}
 
 	// admission.PatchResponse generates a Response containing patches.
-	return admission.PatchResponse(pod, copy)
+	return admission.PatchResponse(resource, copy)
 }
 
 // secretPullerInjector implements inject.Client.
@@ -88,10 +91,10 @@ func (a *secretPullerInjector) InjectDecoder(d types.Decoder) error {
 	return nil
 }
 
-func (a *secretPullerInjector) mutatePodsFn(ctx context.Context, pod *corev1.Pod) error {
+func (a *secretPullerInjector) mutateResourceFn(ctx context.Context, resource *appsv1.Deployment) error {
 	log.Println("I got a request")
 
-	spec := pod.Spec
+	spec := resource.Spec.Template.Spec
 
 	vaultAddr := os.Getenv(vaultAddrVar)
 	if vaultAddr == "" {
@@ -110,7 +113,8 @@ func (a *secretPullerInjector) mutatePodsFn(ctx context.Context, pod *corev1.Pod
 	}
 
 	spec.Containers = mutatedContainers
-	pod.Spec = spec
+
+	resource.Spec.Template.Spec = spec
 
 	return nil
 }
